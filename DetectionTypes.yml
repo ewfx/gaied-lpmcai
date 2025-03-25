@@ -1,9 +1,25 @@
-adjustment: request an adjustment, request for modification of terms, seeking adjustment to our loan , considering a change in repayment, proposed alteration of interest rate, requesting a revision
-au traansfer: AU Transfer, Automatic Underwriting Transfer, Underwriting Transfer, Transfer to Authorization Unit, AU Reassignment, Underwriting System, AU System Update Transfer, Transfer to AU System, Underwriting Process Transfer, System Transfer for Underwriting
-closing notice: notice of closing, upcoming closing, closing date is scheduled, closing documents, confirming the closing arrangements, final approval before proceeding to close, necessary information for closing, closing Date, closing requirements, loan closing
-               reallocation fees: discuss the reallocation fees, clarification on the reallocation fee structure, reallocation fee, revisit the reallocation fees, reallocation fees applied, breakdown of the reallocation fees, adjustment to reallocation fees
-               amendment fees : Amendment Fee, Modification Costs, Amended Loan Agreement, Amendment Request, Rewriting Terms , Amendment to Loan Terms, Legal Fees for Amendment, Amendment, Amendment Documentation Fee
-               reallocation principal: Reallocation of Principal, Reallocation Request, Principal Distribution, Principal Reallocation, Adjustment of Principal Balance, Reallocation of Loan Funds, Modification of Principal Payment, Reassignment of Principal, Adjustment to Loan Principal, Reallocation of Loan Principal Amount
-commitment change: Commitment Change, Change in Commitment, Adjustment to Commitment, Modification of Commitment, Loan Commitment Change, Revised Loan Commitment, Increase in Commitment, Decrease in Commitment, Commitment Reallocation, New Commitment Terms, Commitment Term Adjustment
-                cahsless roll: Cashless Roll, Cashless Refinancing, Cashless Renewal, Loan Extension Without Cash Payment, Cashless Rollover, Non-Cash Refinancing, Loan Refinance Without Cash, No-Cash Loan Extension, Cashless Facility Renewal, Loan Extension without Cash Settlement
-                decrease: Reduce loan commitment, Decrease credit facility, Lower the credit limit, Reduce borrowing capacity, Request to downsize the loan, Decrease available funds, Amend loan to lower amount, Reduce exposure under the facility
+adjustment: 
+          keyword: request an adjustment, request for modification of terms, seeking adjustment to our loan , considering a change in repayment, proposed alteration of interest rate, requesting a revision
+au traansfer:
+          keyword: AU Transfer, Automatic Underwriting Transfer, Underwriting Transfer, Transfer to Authorization Unit, AU Reassignment, Underwriting System, AU System Update Transfer, Transfer to AU System, Underwriting Process Transfer, System Transfer for Underwriting
+closing notice: 
+          keyword: notice of closing, upcoming closing, closing date is scheduled, closing documents, confirming the closing arrangements, final approval before proceeding to close, necessary information for closing, closing Date, closing requirements, loan closing
+          sub-request:
+                 - reallocation fees: discuss the reallocation fees, clarification on the reallocation fee structure, reallocation fee, revisit the reallocation fees, reallocation fees applied, breakdown of the reallocation fees, adjustment to reallocation fees
+                 - amendment fees : Amendment Fee, Modification Costs, Amended Loan Agreement, Amendment Request, Rewriting Terms , Amendment to Loan Terms, Legal Fees for Amendment, Amendment, Amendment Documentation Fee
+                 - reallocation principal: Reallocation of Principal, Reallocation Request, Principal Distribution, Principal Reallocation, Adjustment of Principal Balance, Reallocation of Loan Funds, Modification of Principal Payment, Reassignment of Principal, Adjustment to Loan Principal, Reallocation of Loan Principal Amount
+commitment change: 
+          keyword: Commitment Change, Change in Commitment, Adjustment to Commitment, Modification of Commitment, Loan Commitment Change, Revised Loan Commitment, Increase in Commitment, Decrease in Commitment, Commitment Reallocation, New Commitment Terms, Commitment Term Adjustment
+          sub-request:
+                 - cahsless roll: Cashless Roll, Cashless Refinancing, Cashless Renewal, Loan Extension Without Cash Payment, Cashless Rollover, Non-Cash Refinancing, Loan Refinance Without Cash, No-Cash Loan Extension, Cashless Facility Renewal, Loan Extension without Cash Settlement
+                 - decrease: Reduce loan commitment, Decrease credit facility, Lower the credit limit, Reduce borrowing capacity, Request to downsize the loan, Decrease available funds, Amend loan to lower amount, Reduce exposure under the facility
+                 - increase: Request to increase loan commitment, Expand credit facility, Increase borrowing capacity, Request for additional funding, Extend credit line, Facility expansion request
+fee payment: 
+          keyword: Payment of fees, Processing fee payment, Invoice for loan fees, Settlement of applicable fees, Payment confirmation for fees
+          sub-request:
+                 - ongoing fees: Recurring facility fee payment, Annual loan maintenance fee, Quarterly commitment fee, Periodic fee charge, Monthly loan servicing fee, Accrued facility fee, Routine credit facility charge
+                 - letter of credit fee: LC issuance charges, Letter of credit fee payment, LC amendment fee, Advising fee for letter of credit, LC confirmation fee, Charges for standby letter of credit, Accrued letter of credit fees, Letter of credit service charges
+money movement inbound: 
+          keyword: Incoming payment received, Funds received for loan, Deposit confirmation, Credit to loan account, Incoming wire transfer, Loan repayment received, Inbound payment details, Crediting funds to account
+          sub-request:
+                 - principal: Principal payment received, Loan principal repayment, Scheduled principal deposit, Prepayment of principal, Lump sum principal payment, Principal wire transfer, Advance payment toward principal
