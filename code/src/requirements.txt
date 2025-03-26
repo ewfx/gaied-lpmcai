@@ -4,3 +4,8 @@ accelerate
 bitsandbytes
 xformers
 pyYAML
+jaydebeapi
+pdfplumber
+pypandoc
+python-docx
+bs4
