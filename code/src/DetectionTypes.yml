@@ -23,3 +23,8 @@ money movement inbound:
           keyword: Incoming payment received, Funds received for loan, Deposit confirmation, Credit to loan account, Incoming wire transfer, Loan repayment received, Inbound payment details, Crediting funds to account
           sub-request:
                  - principal: Principal payment received, Loan principal repayment, Scheduled principal deposit, Prepayment of principal, Lump sum principal payment, Principal wire transfer, Advance payment toward principal
+money movement outbound:
+          keyword: Outgoing payment initiated, Funds transferred from loan, Debit from loan account, Outgoing wire transfer, Loan disbursement processed, Outbound payment confirmation, Payment sent to beneficiary, Fund transfer request submitted, Loan payout executed, Money sent from account, Wire transfer to external account, Outgoing remittance transaction, EFT (Electronic Funds Transfer) processed
+          sub-request:
+                 - timebound: Timebound Payment, Fixed Duration Transfer, Scheduled Transaction, Deadline-Based Payment, Time-Sensitive Transfer, Expiry-Based Movement, Loan Time Restriction, Periodic Money Transfer, Timed Transaction, Restricted Period Transfer, Scheduled Financial Action
+                 - foreign currency: Foreign Currency Payment, International Transfer, FX Transaction, Cross-Border Payment, Foreign Exchange Settlement, Multi-Currency Transaction, Overseas Remittance, Currency Conversion, Global Payment, Forex Payment
