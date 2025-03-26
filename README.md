@@ -16,3 +16,13 @@ A detailed step-by-step guide how to run the application is available in the [Co
 - 📹 [Solution Walkthrough](https://github.com/EashwarPrabu/gaied-lpmcai-main/blob/main/artifacts/demo/PPT-demo-lpmc-ai.mp4)
 
 🖼️ Screenshots:
+1. Processing Email
+![Processing Email](/artifacts/demo/Processing-Email.png)
+2. Email Classification
+![Email Classification](/artifacts/demo/Email%20Classification.png)
+3. Attachment Classification
+![Attachment Classification](/artifacts/demo/Attachment%20Classification.png)
+4. No Matching Criteria (Email content doesn't match with configured yml file)
+![No Matching Criteria](/artifacts/demo/No%20Matching%20Criteria.png)
+5. Duplicate Email Detection
+![Duplicate Email Detection](/artifacts/demo/Duplicate%20Email.png)
