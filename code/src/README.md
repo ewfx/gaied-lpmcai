@@ -1,4 +1,5 @@
 # Cookbook for running the application
+Modify DetectionTypes.yml to add/delete/modify key phrases for classification of Types and Sub-Types
 ## Tech Stack used:
 - Frontend - Streamlit
 - LLM Orchestrator - HuggingFace Transformer
