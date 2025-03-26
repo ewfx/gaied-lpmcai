@@ -17,45 +17,35 @@ import pdfplumber
 import pypandoc
 from docx import Document
 from bs4 import BeautifulSoup
+import sqlite3
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Setup H2 DB and store it in Streamlit session to ensure DB connections are not loaded up in every render of application
-def setup_h2_database():
-    if "h2_connection" not in st.session_state:
-        logger.info("Setting up H2 database...")
-        try:
-            conn = jaydebeapi.connect(
-                "org.h2.Driver",
-                "jdbc:h2:~/email_db",
-                ["sa", ""],
-                "h2.jar"
+# Setup Sqlite3 DB and store it in Streamlit session to ensure DB connections are not loaded up in every render of application
+def setup_sqlite_database():
+    if "db_conn" not in st.session_state:
+        conn = sqlite3.connect("lmpc_genai_db.sqlite", check_same_thread=False)
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS emails (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename VARCHAR(255),
+                sender VARCHAR(255),
+                request_type VARCHAR(255),
+                sub_request_type TEXT,
+                confidence VARCHAR(255),
+                email_hash VARCHAR(255)
             )
-            cursor = conn.cursor()
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS emails (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    filename VARCHAR(255),
-                    sender VARCHAR(255),
-                    request_type VARCHAR(255),
-                    sub_request_type TEXT,
-                    confidence VARCHAR(255),
-                    email_hash VARCHAR(255)
-                )
-            """)
+        """)
+        conn.commit()  # Save table creation
+        st.session_state["db_conn"] = conn
+        st.session_state["db_cursor"] = cursor
+        logger.info("SQLite database setup complete.")
 
-            # Store in session state to prevent reloading
-            st.session_state.h2_connection = conn
-            st.session_state.h2_cursor = cursor
-            logger.info("H2 database setup complete.")
-        except Exception as e:
-            logger.error(f"Error setting up H2 database: {str(e)}")
-            st.session_state.h2_connection = None
-            st.session_state.h2_cursor = None
+    return st.session_state["db_conn"], st.session_state["db_cursor"]
 
-    return st.session_state.h2_connection, st.session_state.h2_cursor
 
 # Load and cache the model using Streamlit cache resource annotation to ensure app doesn't reload during every render
 @st.cache_resource
@@ -163,7 +153,7 @@ def classify(input_text):
     classifiedOutput = invoke(formatted_prompt)
     logger.info(f"Classified results: {classifiedOutput}")
     return ast.literal_eval(classifiedOutput)
-    
+
 # Extract takes content of mail as parameter, creates the NER prompt and then calls invoke function to get LLM response
 def extract(input_text):
     formatted_prompt = ner_prompt.format(input_text=input_text)
@@ -245,7 +235,7 @@ def extract_text_from_txt(txt_path):
     except Exception as e:
         logger.error(f"Error reading TXT {txt_path}: {e}")
         return None
-    
+
 # Parses the file uploaded through UI.
 # Walks through all the email content and its attachment and returns them
 def parse_eml(file):
@@ -297,7 +287,7 @@ def parse_eml(file):
                 attachments.append({
                     "name": attachment_name,
                     "type": attachment_type,
-                    "content": attachment_content,
+                    "content": attachment_content,  # Extracted text or Base64
                     "size": len(attachment_data)
                 })
 
@@ -322,59 +312,88 @@ def compute_hash(email_data):
     text = email_data['subject'] + email_data['body']
     email_hash = hashlib.md5(text.encode()).hexdigest()
     logger.info(f"Hash computed: {email_hash}")
+    return email_hash
 
 # Detects duplicates from DB using email sender and email hash
 def detect_duplicates(cursor, email_data, email_hash):
-    logger.info(f"Detecting duplicates for email: {email_data['filename']}")
+    logger.info(f"Checking for duplicates: {email_data['filename']}")
     try:
-        cursor.execute("SELECT COUNT(*) FROM emails WHERE sender = ? and email_hash = ?", (email_data['from'], email_hash,))
+        cursor.execute("SELECT COUNT(*) FROM emails WHERE email_hash = ? AND sender = ?",
+                       (email_hash, email_data['from']))
         count = cursor.fetchone()[0]
         is_duplicate = count > 0
-        logger.info(f"Duplicate check: {'Duplicate' if is_duplicate else 'Not a duplicate'}")
-        return is_duplicate
+        data = None
+        if is_duplicate:
+          cursor.execute("SELECT * FROM emails WHERE email_hash = ? AND sender = ?",
+                       (email_hash, email_data['from']))
+          data = cursor.fetchone()
+          retrieved_data = {
+              "isDuplicate": True,
+              "filename": data[1],
+              "sender": data[2],
+              "requestType": data[3],
+              "subRequestType": data[4],
+              "probability": data[5],
+          }
+        logger.info(f"Duplicate check result: {'Duplicate' if is_duplicate else 'Not a duplicate'}")
+        logger.info(f"Retrieved data: {data}")
+        return is_duplicate, retrieved_data
     except Exception as e:
         logger.error(f"Error detecting duplicates for {email_data['filename']}: {str(e)}")
-        return False
-    
-# Store the results for an email in H2 DB
+        return False, None
+
+# Store the results for an email in Sqlite3 DB
 def store_email_data(cursor, email_data, output, email_hash):
+    sub_request_types = "/".join(output['output']['subRequestTypes'])
     logger.info(f"Storing email data for: {email_data['filename']}")
     try:
         cursor.execute("""
-            INSERT INTO emails (filename, sender, request_type, sub_request_type, confidence, email_hash) VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO emails (filename, sender, request_type, sub_request_type, confidence, email_hash)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, (
             email_data['filename'],
             email_data['from'],
-            output['result']['output']['requestType'],
-            json.dumps(output['result']['output']['subRequestTypes']),
-            output['result']['probability'],
+            output['output']['requestType'],
+            sub_request_types,
+            output['output']['probability'],
             email_hash
         ))
         logger.info("Email data stored successfully.")
+    except sqlite3.IntegrityError:
+        logger.warning(f"Duplicate email detected, skipping storage: {email_data['filename']}")
     except Exception as e:
         logger.error(f"Error storing email data for {email_data['filename']}: {str(e)}")
 
+
 # Streamlit app title
-st.title("Email content classifier")
+st.title("GenAI LPMC - Email content classifier")
 uploaded_file = st.file_uploader("Upload an .eml file", type=["eml"])
 
 if uploaded_file:
     with uploaded_file:
         filename = uploaded_file.name
         uploaded_file.seek(0)  # Reset file pointer before reading
-        email_data, attachments = parse_eml(uploaded_file)
+        email_data = parse_eml(uploaded_file)
+        print("Updated contents")
+        print(email_data)
         email_data["filename"] = filename
         email_hash = compute_hash(email_data)
-        conn, cursor = setup_h2_database()
+        conn, cursor = setup_sqlite_database()
         if conn and cursor:
-            isDuplicate = detect_duplicates(cursor, email_data, email_hash)
-            if isDuplicate:
+            isDuplicate, data = detect_duplicates(cursor, email_data, email_hash)
+            if isDuplicate and data:
                 logger.error(f"Dupicate detected. Mail contents already exists in DB")
+                st.write("Duplicated email detected. The results of the email are: ")
+                st.json(data)
             else:
                 with st.spinner(f"Processing email {filename}... Please wait ⏳"):
-                    result = classify_and_extract(email_data["body"])
+                    attachment_data = ""
+                    for attachment in email_data["attachments"]:
+                        if attachment["type"] == "text":
+                            attachment_data += "\n\n--- Attachment: {} ---\n{}".format(attachment["name"], attachment["content"])
+                    result = classify_and_extract(email_data["body"] + attachment_data)
                     store_email_data(cursor, email_data, result, email_hash)
-                    conn.comit()
+                    conn.commit()
                     output = {
                         "emailContents": email_data,
                         "result": result
