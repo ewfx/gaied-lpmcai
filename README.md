@@ -14,7 +14,8 @@ A detailed step-by-step guide how to run the application is available in the [Co
 - 🔗 [Slide deck](https://github.com/EashwarPrabu/gaied-lpmcai-main/blob/main/artifacts/demo/lpmcai-presentation.pptx)
 - 📹 [Application Walkthrough](https://github.com/EashwarPrabu/gaied-lpmcai-main/blob/main/artifacts/demo/code-demo-walkthrough-lpmc-ai.mp4)
 - 📹 [Solution Walkthrough](https://github.com/EashwarPrabu/gaied-lpmcai-main/blob/main/artifacts/demo/PPT-demo-lpmc-ai.mp4)
-
+- 🔗 [Google Drive with all artifacts](https://drive.google.com/drive/folders/1xjj2cxprQ_oaXkfa74QZUSVDuAAG89dw)
+  
 🖼️ Screenshots:
 1. Processing Email
 ![Processing Email](/artifacts/demo/Processing-Email.png)
